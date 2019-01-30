@@ -8,6 +8,7 @@
 		_SnowColor ("Snow Color", Color) = (1.0, 1.0, 1.0, 1.0)
 		_SnowDirection ("Snow Direction", Vector) = (0, 1, 0)
 		_SnowDepth ("Snow Depth", Range(0, 0.3)) = 0.1
+		_Wetness ("Wetness", Range(0, 0.5)) = 0.3
 	}
 
     SubShader {
@@ -23,6 +24,7 @@
 		float4 _SnowColor;
 		float3 _SnowDirection;
 		float _SnowDepth;
+		float _Wetness;
 
 		// shader的输入作为一个结构体
         struct Input {
@@ -42,19 +44,18 @@
 			half4 c = tex2D (_MainTex, IN.uv_MainTex); // 从MainTex取出对应值
 			o.Normal = UnpackNormal(tex2D(_Bump, IN.uv_Bump)); // 获取法线向量
 
-			if (dot(WorldNormalVector(IN, o.Normal), _SnowDirection.xyz) > lerp(1, -1, _Snow)) {
-				// lerp(st, en, t)是线性插值的意思，从st到en, t是0到1之间的比重参数
-				o.Albedo = _SnowColor.rgb;
-			} else {
-				o.Albedo = c.rgb;
-			}
+			// lerp(st, en, t)是线性插值的意思，从st到en, t是0到1之间的比重参数
+			float difference = dot(WorldNormalVector(IN, o.Normal), _SnowDirection.xyz) - lerp(1, -1, _Snow);
+			difference = saturate(difference / _Wetness);
+
+			o.Albedo = difference * (_SnowColor.rgb) + (1.0 - difference) * c.rgb;
 			o.Alpha = c.a;
         }
 
 		void vert (inout appdata_full v) {
 			float4 sn = mul(UNITY_MATRIX_IT_MV, _SnowDirection); // 将世界坐标系下的向量换成模型坐标系
 			
-			if (dot(v.normal, sn.xyz) >= lerp(1, -1, _Snow * 2.0 / 3.0 )) {
+			if (dot(v.normal, sn.xyz) >= lerp(1, -1, (1 - _Wetness) * _Snow * 2.0 / 3.0 )) {
 				v.vertex.xyz += (sn.xyz + v.normal) * _SnowDepth * _Snow;
 			}
 		}
