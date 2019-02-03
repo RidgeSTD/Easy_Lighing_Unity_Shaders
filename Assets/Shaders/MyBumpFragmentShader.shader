@@ -18,6 +18,8 @@
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_fwdbase
+
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -44,7 +46,7 @@
 
                 float2 uv2 : TEXCOORD1; // coordinate in bump texture
                 float3 lightDirection : TEXCOORD2;
-                // LIGHTING_COORDS(3, 4)
+                LIGHTING_COORDS(3, 4)
             };
 
             v2f vert (a2v v) {
@@ -68,28 +70,30 @@
 
                 float3 lightColor = UNITY_LIGHTMODEL_AMBIENT.xyz;
                 // lightDirection is the unnormalized vector from light source to point on model
-                float lightDistanceSq = dot(i.lightDirection, i.lightDirection);
                 float cosTheta = saturate(dot(normalize(n), normalize(i.lightDirection)));
-                float atten = 1.0 / (1.0 + lightDistanceSq * unity_LightAtten[0].z); //光源因为距离而产生衰减，取决于是点光源还是Directed
-                // float atten = LIGHT_ATTENUATION(i);
+                // float lightDistanceSq = dot(i.lightDirection, i.lightDirection);
+                // float atten = 1.0 / (1.0 + lightDistanceSq * unity_LightAtten[0].z); //光源因为距离而产生衰减，取决于是点光源还是Directed
+                float atten = LIGHT_ATTENUATION(i);
 
                 // _LightColor0存了与重要的光源，最近的或者最亮的
                 lightColor += _LightColor0.rgb * (cosTheta * atten);
-                c.rgb = lightColor * c.rgb;
+                c.rgb = lightColor * c.rgb * 2;
                 return c;
             }
             ENDCG
         }
 
         Pass {
+            // First the tags
             Tags { "LightMode" = "ForwardAdd" }  
             Cull Back
             Lighting On
-            Blend One One
+            Blend One One  
 
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_fwdadd
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
@@ -116,7 +120,7 @@
 
                 float2 uv2 : TEXCOORD1; // coordinate in bump texture
                 float3 lightDirection : TEXCOORD2;
-                // LIGHTING_COORDS(3, 4)
+                LIGHTING_COORDS(3, 4)
             };
 
             v2f vert (a2v v) {
@@ -140,18 +144,18 @@
 
                 float3 lightColor = UNITY_LIGHTMODEL_AMBIENT.xyz;
                 // lightDirection is the unnormalized vector from light source to point on model
-                float lightDistanceSq = dot(i.lightDirection, i.lightDirection);
                 float cosTheta = saturate(dot(normalize(n), normalize(i.lightDirection)));
-                float atten = 1.0 / (1.0 + lightDistanceSq * unity_LightAtten[0].z); //光源因为距离而产生衰减，取决于是点光源还是Directed
-                // float atten = LIGHT_ATTENUATION(i);
+                // float lightDistanceSq = dot(i.lightDirection, i.lightDirection);
+                // float atten = 1.0 / (1.0 + lightDistanceSq * unity_LightAtten[0].z); //光源因为距离而产生衰减，取决于是点光源还是Directed
+                float atten = LIGHT_ATTENUATION(i);
 
                 // _LightColor0存了与重要的光源，最近的或者最亮的
                 lightColor += _LightColor0.rgb * (cosTheta * atten);
-                c.rgb = lightColor * c.rgb;
+                c.rgb = lightColor * c.rgb * 2;
                 return c;
             }
             ENDCG
-        }
+        }        
     }
     FallBack "Diffuse"
 }
