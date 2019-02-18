@@ -11,7 +11,7 @@
 
         Pass {
             // First the tags
-            Tags { "LightMode" = "ForwardBase" }  
+            Tags { "LightMode" = "ForwardBase" }
             Cull Back
             Lighting On
 
