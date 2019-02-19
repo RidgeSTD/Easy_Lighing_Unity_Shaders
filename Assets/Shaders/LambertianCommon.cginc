@@ -19,8 +19,6 @@ uniform float4 _LightColor0; // main light source
 
 v2f vert (appdata v) {
     v2f o;
-    TANGENT_SPACE_ROTATION;
-    
     o.lightDirection_obj = ObjSpaceLightDir(v.vertex);
     o.pos_clip = UnityObjectToClipPos(v.vertex);
     o.uv = TRANSFORM_TEX(v.uv, _MainTex);
