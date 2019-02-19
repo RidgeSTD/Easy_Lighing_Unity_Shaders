@@ -23,22 +23,7 @@
 			#include "LambertianCommon.cginc"
 			#endif
 
-			uniform float4 _LightColor0; // main light source
 
-			sampler2D _MainTex;
-			float4 _MainTex_ST;
-			
-			v2f vert (appdata v) {
-				v2f o;
-				TANGENT_SPACE_ROTATION;
-				
-				o.lightDirection_obj = ObjSpaceLightDir(v.vertex);
-				o.pos_clip = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				o.normal = v.normal;
-				return o;
-			}
-			
 			fixed4 frag (v2f i) : SV_Target {
 				fixed4 col = tex2D(_MainTex, i.uv);
 
@@ -71,22 +56,6 @@
 			#include "LambertianCommon.cginc"
 			#endif
 
-			uniform float4 _LightColor0; // main light source
-
-			sampler2D _MainTex;
-			float4 _MainTex_ST;
-			
-			v2f vert (appdata v) {
-				v2f o;
-				TANGENT_SPACE_ROTATION;
-				
-				o.lightDirection_obj = ObjSpaceLightDir(v.vertex);
-				o.pos_clip = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				o.normal = v.normal;
-				return o;
-			}
-			
 			fixed4 frag (v2f i) : SV_Target {
 				fixed4 col = tex2D(_MainTex, i.uv);
 
