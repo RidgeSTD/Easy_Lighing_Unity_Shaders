@@ -91,11 +91,10 @@
 				fixed4 col = tex2D(_MainTex, i.uv);
 
 				// lambertian model starts
-				fixed3 lightColor = UNITY_LIGHTMODEL_AMBIENT.xyz;
 				float distanceSq = dot(i.lightDirection_obj, i.lightDirection_obj);
 				// attenuation from both distance and unity default setting 衰减
 				float atten = 1.0 / (1.0 + distanceSq + unity_LightAtten[0].z);
-				lightColor += _LightColor0 * saturate(dot(i.normal, normalize(i.lightDirection_obj))) * atten;
+				fixed3 lightColor = _LightColor0 * saturate(dot(i.normal, normalize(i.lightDirection_obj))) * atten;
 				
 				col.rgb = col.rgb * lightColor;
 				return col;
