@@ -1,4 +1,4 @@
-﻿Shader "prac/BlinnPhongShader"
+﻿Shader "prac/PhongShader"
 {
 	Properties
 	{
@@ -27,8 +27,7 @@
 			
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
-			#include "BlinnPhongCommon.cginc"
-
+			#include "PhongCommon.cginc"
 			
 			ENDCG
 		}
@@ -44,7 +43,7 @@
 
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
-			#include "BlinnPhongCommon.cginc"
+			#include "PhongCommon.cginc"
 
 			ENDCG
 		}

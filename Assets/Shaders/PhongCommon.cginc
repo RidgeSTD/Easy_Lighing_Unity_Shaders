@@ -38,17 +38,16 @@ fixed4 frag (v2f i) : SV_Target
 {
     // DirectionalLight的w是0，其方向与定点位置无关，此时_WorldSpaceLightPos0.w==0。反之如果是点光源，应计算与定点的相对位置
     float3 L = (_WorldSpaceLightPos0 - i.pos_world).xyz * _WorldSpaceLightPos0.w + _WorldSpaceLightPos0.xyz * (1- _WorldSpaceLightPos0.w);
-    float3 L_normalize = normalize(L);
     float3 V = normalize((_WorldSpaceCameraPos - i.pos_world).xyz);
-    // Blinn-Phong模型公式: I = k_a * I_L + k_d * I_L * dot(N, L) + k_s * I_L * dot(H, N) ^ n
+    // Phong模型公式: I = k_a * I_L + k_d * I_L * dot(N, L) + k_s * I_L * dot(R_L, V) ^ n
     fixed4 col = tex2D(_MainTex, i.uv);
     float distanceSq = dot(L, L);
     // 如果这里是Directional light就不应该考虑衰减，否则w是1，就考虑衰减了
     float atten = 1.0 / (1.0 + (distanceSq + unity_LightAtten[0].z) * _WorldSpaceLightPos0.w);
-    float3 H = normalize(L_normalize + V); // Blinn-Phong模型使用的是half-vector，保证与法线相乘难以出现负值
+    float3 R = normalize(reflect(-L, i.normal_world));
 
     float4 lightColor = _ka * unity_AmbientSky; // 环境光
-    lightColor += _kd * _LightColor0 * saturate(dot(i.normal_world, L_normalize)); // diffuse反射
-    lightColor += _ks * _LightColor0  * pow(saturate(dot(H, i.normal_world)), _n); // specular反射
+    lightColor += _kd * _LightColor0 * saturate(dot(i.normal_world, normalize(L))); // diffuse反射
+    lightColor += _ks * _LightColor0  * pow(saturate(dot(R, V)), _n); // specular反射
     return col * lightColor; // 将光源与材料本身颜色叠加
 }
