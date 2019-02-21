@@ -29,8 +29,6 @@ v2f vert (appdata v)
     o.pos_world = mul(UNITY_MATRIX_M, v.vertex);
     o.uv = TRANSFORM_TEX(v.uv, _MainTex);
     o.normal_world = normalize(mul(UNITY_MATRIX_M, float4(v.normal, 0.)).xyz);
-    // o.lightDirection_world = (_WorldSpaceLightPos0 - o.pos_world).xyz;
-    // o.cameraDirection_world_norm = normalize((_WorldSpaceCameraPos - o.pos_world).xyz);
     return o;
 }
 

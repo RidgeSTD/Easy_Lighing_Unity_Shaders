@@ -3,10 +3,10 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		_n ("BlinnPhong Exponent", Float) = 45
-		_ka ("BlinnPhong Abient Degree", Float) = 1.0
-		_kd ("BlinnPhong Diffuse Degree", Float) = 1.0
-		_ks ("BlinnPhong Specular Degree", Float) = 1.0
+		_n ("Phong Exponent", Float) = 45
+		_ka ("Phong Abient Degree", Float) = 1.0
+		_kd ("Phong Diffuse Degree", Float) = 1.0
+		_ks ("Phong Specular Degree", Float) = 1.0
 	}
 	SubShader
 	{
