@@ -1,4 +1,4 @@
-﻿Shader "prac/PhongShader"
+﻿Shader "EasyLighting/PhongShader"
 {
 	Properties
 	{

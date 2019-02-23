@@ -1,4 +1,4 @@
-﻿Shader "prac/LambertianShader" {
+﻿Shader "EasyLighting/LambertianShader" {
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
 	}

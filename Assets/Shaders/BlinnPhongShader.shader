@@ -1,4 +1,4 @@
-﻿Shader "prac/BlinnPhongShader"
+﻿Shader "EasyLighting/BlinnPhongShader"
 {
 	Properties
 	{
