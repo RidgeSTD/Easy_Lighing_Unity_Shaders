@@ -4,9 +4,9 @@
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 		_n ("Phong Exponent", Float) = 45
-		_ka ("Phong Abient Degree", Float) = 1.0
-		_kd ("Phong Diffuse Degree", Float) = 1.0
-		_ks ("Phong Specular Degree", Float) = 1.0
+		_ka ("Phong Abient Degree", Range(0, 1)) = 1.0
+		_kd ("Phong Diffuse Degree", Range(0, 1)) = 1.0
+		_ks ("Phong Specular Degree", Range(0, 1)) = 1.0
 	}
 	SubShader
 	{
