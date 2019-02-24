@@ -61,16 +61,16 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _D: 0.16
+    - _D: 0.125
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EtaI: 1
     - _EtaO: 0.65
-    - _EtaT: 0
+    - _EtaT: 0.113
     - _GlossMapScale: 1
     - _Glossiness: 1
     - _GlossyReflections: 1
-    - _K: 0.246
+    - _K: 0.128
     - _Metallic: 1
     - _Mode: 0
     - _OcclusionStrength: 1
