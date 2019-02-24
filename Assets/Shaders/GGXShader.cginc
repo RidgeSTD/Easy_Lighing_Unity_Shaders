@@ -62,7 +62,7 @@ float4 frag(v2f IN) : SV_TARGET {
     // DirectionalLight的w是0，其方向与定点位置无关，此时_WorldSpaceLightPos0.w==0。反之如果是点光源，应计算与定点的相对位置
     // float3 L = normalize(IN.lightDirection_world);
     float3 L = (_WorldSpaceLightPos0 - IN.pos_world).xyz * _WorldSpaceLightPos0.w + _WorldSpaceLightPos0.xyz * (1- _WorldSpaceLightPos0.w);
-    // L = normalize(L);
+    L = normalize(L);
     // Direction in which light is scattered
     // since we don't consider indirect light, V is camera direction
     float3 V = normalize((_WorldSpaceCameraPos - IN.pos_world).xyz);
