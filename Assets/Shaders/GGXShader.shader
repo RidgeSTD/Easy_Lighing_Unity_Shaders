@@ -6,6 +6,8 @@ Shader "EasyLighting/PBS/GGX" {
         _EtaT ("Refraction Index of Incident Side", Range(0, 1)) = 1.0
         _K ("Parameter for G Function", Range(0, 1)) = 1.0
         _D ("Roughness for NDF", Range(0, 1)) = 1.0
+        _DiffWeight("Diffuse Weight", Range(0, 1)) = 0.5
+        _SpecWeight("Specular Weight", Range(0, 1)) = 0.5
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
@@ -17,6 +19,7 @@ Shader "EasyLighting/PBS/GGX" {
 
             CGPROGRAM
             #include "UnityCG.cginc"
+            #include "Lighting.cginc"
             #include "GGXShader.cginc"
 
             #pragma vertex vert
@@ -32,6 +35,7 @@ Shader "EasyLighting/PBS/GGX" {
 
             CGPROGRAM
             #include "UnityCG.cginc"
+            #include "Lighting.cginc"
             #include "GGXShader.cginc"
 
             #pragma vertex vert

@@ -21,6 +21,8 @@ float _EtaI;
 float _EtaT;
 float _K;
 float _D;
+float _SpecWeight;
+float _DiffWeight;
 
 v2f vert(a2v v) {
     v2f o;
@@ -62,7 +64,7 @@ float4 frag(v2f IN) : SV_TARGET {
     // DirectionalLight的w是0，其方向与定点位置无关，此时_WorldSpaceLightPos0.w==0。反之如果是点光源，应计算与定点的相对位置
     // float3 L = normalize(IN.lightDirection_world);
     float3 L = (_WorldSpaceLightPos0 - IN.pos_world).xyz * _WorldSpaceLightPos0.w + _WorldSpaceLightPos0.xyz * (1- _WorldSpaceLightPos0.w);
-    L = normalize(L);
+    float3 normalizedL = normalize(L);
     // Direction in which light is scattered
     // since we don't consider indirect light, V is camera direction
     float3 V = normalize((_WorldSpaceCameraPos - IN.pos_world).xyz);
@@ -71,15 +73,21 @@ float4 frag(v2f IN) : SV_TARGET {
     // Microsurface normal
     // float3 m_obj = 
     // Half-direction for reflection
-    float3 H = normalize(L + V);
+    float3 H = normalize(normalizedL + V);
     // Half-direction for transmission
     // float3 ht_obj
     // f_s = f_r + f_t
-    float LdotN = abs(dot(L, N)) + EPSILON;
+    float LdotN = abs(dot(normalizedL, N)) + EPSILON;
     float VdotN = abs(dot(V, N)) + EPSILON;
-    float F = F_Schlick(L, H, IN.F0);
+    float F = F_Schlick(normalizedL, H, IN.F0);
     float G = G_GGX(LdotN, VdotN);
     float D = D_GGX_TR(N, H);
     float fr = F * G * D / 4. / LdotN / VdotN;
-    return col * fr * VdotN;
+
+    // lambert model as diffuse part
+    float distanceSq = dot(L, L) * _WorldSpaceLightPos0.w;
+    float atten = 1.0 / (1.0 + distanceSq + unity_LightAtten[0].z);
+    fixed4 diffuseLightColor = _LightColor0 * saturate(dot(N, normalizedL)) * atten;
+    
+    return col * (fr * VdotN * _SpecWeight + diffuseLightColor * _DiffWeight);
 }
