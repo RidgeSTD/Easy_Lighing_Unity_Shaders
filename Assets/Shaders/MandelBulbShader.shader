@@ -3,7 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Scale ("Scale", Float) = 1
+        _Scale ("Scale", Range(0.1, 2)) = 1
     }
     SubShader
     {
@@ -28,6 +28,9 @@
             #define MAX_DIST 1e2
 
             float _Scale;
+            float Power;
+            float ThetaShift;
+            float PhiShift;
 
             struct appdata
             {
@@ -53,7 +56,7 @@
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.ro = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1));
-                o.hitPos = _Scale * v.vertex;
+                o.hitPos = v.vertex / _Scale;
                 
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
@@ -110,6 +113,38 @@
                 return 0.25*log(m)*sqrt(m)/dz;
             }
 
+
+            // loicvdb's implementation
+            // https://www.shadertoy.com/view/wl2SDt
+            float distanceEstimation(float3 pos) {
+                if(length(pos) > 1.5) return length(pos) - 1.2;
+                float3 z = pos;
+                float dr = 1.0, r = 0.0, theta, phi;
+                for (int i = 0; i < 15; i++) {
+                    r = length(z);
+                    if (r>1.5) break;
+                    dr =  pow( r, Power-1.0)*Power*dr + 1.0;
+                    theta = acos(z.z/r) * Power + ThetaShift;
+                    phi = atan(float2(z.y,z.x)) * Power + PhiShift;
+                    float sinTheta = sin(theta);
+                    z = pow(r,Power) * float3(sinTheta*cos(phi), sinTheta*sin(phi), cos(theta)) + pos;
+                }
+                return 0.5*log(r)*r/dr;
+            }
+
+            float3 normalEstimation(float3 pos){
+                float dist = distanceEstimation(pos);
+                float3 xDir = float3(dist, 0, 0);
+                float3 yDir = float3(0, dist, 0);
+                float3 zDir = float3(0, 0, dist);
+                return normalize(float3(distanceEstimation(pos + xDir),
+                                        distanceEstimation(pos + yDir),
+                                        distanceEstimation(pos + zDir))
+                                - float3(dist, dist, dist));
+            }
+            // end of loicvdb's implementation
+
+
             float GetDist(float3 p) {
                 return length(p) - 0.2;
             }
@@ -125,18 +160,21 @@
                 return normalize(n);
             }
 
-            float RayMarching(float3 ro, float3 rd, out fixed4 resCol) {
+            // float RayMarching(float3 ro, float3 rd, out fixed4 resCol) {
+            float RayMarching(float3 ro, float3 rd) {
                 float dO = 0;
                 float dS;
                 float3 p = ro;
-                fixed4 col;
+                // fixed4 col;
                 for (int i = 0; i < MAX_STEP; i++) {
                     p = ro + dO * rd;
                     // dS = GetDist(p);
-                    dS = map(p, col);
+                    // 
+                    // dS = map(p, col); // iq's implementation
+                    dS = distanceEstimation(p); // loicvdb's implementation
                     dO += dS;
                     if (dS < SURF_DIST || dO > MAX_DIST) {
-                        resCol = col;
+                        // resCol = col;
                         break;
                     }
                     
@@ -155,16 +193,24 @@
                 float3 ro = i.ro;
                 float3 rd = normalize(i.hitPos - i.ro);
 
-                float d = RayMarching(ro, rd, col);
+                Power = _Time.y;
+                Power = 3.0 + 5.0 * abs(_SinTime.y);
+                ThetaShift = _Time.z;
+                PhiShift = _Time.z;
+
+
+                // float d = RayMarching(ro, rd, col);
+                float d = RayMarching(ro, rd);
                 if (d >= MAX_DIST) {
                     discard;
                 } else {
-                    // float3 p = ro + rd * d;
+                    float3 p = ro + rd * d;
                     // float3 n = GetNormal(p);
+                    float3 n = normalEstimation(p);
                     
-                    // float3 L = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
-                    // float l = dot(n, L);
-                    // col.rgb = fixed3(l, l, l);
+                    float3 L = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
+                    float l = dot(n, L);
+                    col.rgb = fixed3(l, l, l);
                 }
 
                 // apply fog
