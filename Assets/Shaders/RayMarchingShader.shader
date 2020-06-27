@@ -97,7 +97,9 @@
                 float3 rd = normalize(i.hitPos - i.ro);
 
                 float d = RayMarching(ro, rd);
-                if (d < MAX_DIST) {
+                if (d >= MAX_DIST) {
+                    discard;
+                } else {
                     float3 p = ro + rd * d;
                     float3 n = GetNormal(p);
                     
