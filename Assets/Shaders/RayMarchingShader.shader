@@ -11,6 +11,9 @@
 
         Pass
         {
+            Tags {
+                "LightMode" = "ForwardBase"
+            }
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -20,7 +23,7 @@
             #include "UnityCG.cginc"
 
             #define SURF_DIST 1e-3
-            #define MAX_STEP 20
+            #define MAX_STEP 100
             #define MAX_DIST 1e2
 
             struct appdata
@@ -64,6 +67,7 @@
                     GetDist(p - e.yxy),
                     GetDist(p - e.yyx)
                 );
+                // return float3(0, 1, 0);
                 return normalize(n);
             }
 
@@ -96,8 +100,10 @@
                 if (d < MAX_DIST) {
                     float3 p = ro + rd * d;
                     float3 n = GetNormal(p);
-                    col.rgb = n;
-                    // col.rgb = fixed3(1, 0, 0);
+                    
+                    float3 L = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
+                    float l = dot(n, L);
+                    col.rgb = fixed3(l, l, l);
                 }
 
                 // apply fog
